@@ -83,10 +83,29 @@
             text-decoration: underline;
         }
 
-        /* Hide disclaimer when printing */
+        /* Hide elements and enforce page breaks when printing */
         @media print {
-            .disclaimer-card {
+            .disclaimer-card,
+            .sidebar-panel,
+            .print-hidden { /* Added .print-hidden to hide specific elements like the download button */
                 display: none;
+            }
+            body {
+                display: block; /* Override flex for body in print to allow full width for main content */
+            }
+            main {
+                width: 100%; /* Ensure main content takes full width */
+                margin: 0;
+                padding: 0;
+            }
+            /* Force each program card to start on a new page */
+            #programsContainer .card {
+                break-after: page;
+                margin-bottom: 0 !important; /* Remove bottom margin to prevent extra space at page breaks */
+            }
+            /* Ensure the last card does not force an extra blank page */
+            #programsContainer .card:last-child {
+                break-after: auto;
             }
         }
     </style>
@@ -94,7 +113,7 @@
 <body class="flex flex-col md:flex-row">
 
     <!-- Left Sidebar for Controls -->
-    <aside class="w-full md:w-1/4 bg-white p-6 md:p-8 border-b md:border-r border-gray-200 shadow-sm md:shadow-none flex flex-col space-y-6">
+    <aside class="w-full md:w-1/4 bg-white p-6 md:p-8 border-b md:border-r border-gray-200 shadow-sm md:shadow-none flex flex-col space-y-6 sidebar-panel">
         <h2 class="text-2xl font-bold text-gray-900 mb-4">Manual Builder</h2>
 
         <!-- Step 1: Company Name -->
@@ -111,10 +130,13 @@
             </div>
         </div>
 
-        <!-- Download Button -->
-        <div class="mt-6">
-            <button id="downloadManualBtn" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-md shadow-md transition duration-300 ease-in-out transform hover:scale-105">
+        <!-- Action Buttons -->
+        <div class="mt-6 space-y-3">
+            <button id="downloadManualBtn" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-md shadow-md transition duration-300 ease-in-out transform hover:scale-105 print-hidden">
                 Download Manual (Text)
+            </button>
+            <button id="printPdfBtn" class="w-full bg-green-600 hover:bg-green-700 text-white font-semibold py-2 px-4 rounded-md shadow-md transition duration-300 ease-in-out transform hover:scale-105 print-hidden">
+                Print Manual (PDF)
             </button>
         </div>
     </aside>
@@ -129,7 +151,7 @@
         <div class="card mb-6 bg-yellow-50 border-yellow-200 text-yellow-800 disclaimer-card">
             <h4 class="text-xl font-semibold mb-2 text-yellow-900">Disclaimer: Important Notice</h4>
             <p class="text-sm">
-                This document is provided for informational purposes only. Employers must verify all content for accuracy, completeness, and compliance with all applicable federal, state, and local regulations. This builder does not constitute legal or safety advice, and [Company Name] (placeholder) assumes no liability for its use. Always consult with qualified legal and safety professionals to ensure full compliance.
+                This document is provided for informational purposes only. Employers must verify all content for accuracy, completeness, and compliance with all applicable federal, state, and local regulations. This builder does not constitute legal or safety advice, and the developer assumes no liability for its use. Always consult with qualified legal and safety professionals to ensure full compliance.
             </p>
         </div>
 
@@ -343,6 +365,43 @@
                 <p>Solicit feedback from operators, riggers, and supervisors to identify areas for improvement.</p>
                 <p>Document each review, noting changes made and and reasons for those changes.</p>`
             },
+            disciplinary_action: {
+                title: 'Disciplinary Action Program',
+                body: `<h4>Responsibilities</h4>
+                <p><strong>Director/Safety Officer:</strong> Oversees the disciplinary action program, ensures consistency and fairness, and maintains documentation of all disciplinary actions.</p>
+                <p><strong>Supervisors/Foremen:</strong> Address employee conduct and performance issues promptly, follow the disciplinary process, and document all actions taken.</p>
+                <p><strong>Employees:</strong> Are expected to understand and comply with company policies, procedures, and standards of conduct. Employees have the right to respond to allegations and appeal disciplinary decisions.</p>
+                <h4>Program Details</h4>
+                <p><strong>Purpose:</strong></p>
+                <p>The disciplinary action program is designed to encourage all employees to achieve and maintain standards of conduct, attendance, and job performance, while ensuring consistent and fair treatment for all.</p>
+                <p><strong>Informal Action:</strong></p>
+                <p>Minor issues may be resolved through informal counseling or an oral warning by the immediate supervisor. Most difficulties are expected to be resolved at this stage.</p>
+                <p><strong>Formal Disciplinary Process:</strong></p>
+                <ul>
+                    <li><strong>Investigation:</strong> No disciplinary action will be taken until the case has been investigated. The employee will be informed of the nature of the complaint and given an opportunity to respond before any decision is made.</li>
+                    <li><strong>Right to Representation:</strong> Employees have the right to be accompanied by a union representative or work colleague at any formal disciplinary meeting.</li>
+                </ul>
+                <p><strong>Progressive Discipline:</strong></p>
+                <ul>
+                    <li><strong>Verbal Warning:</strong> For minor offenses, a formal verbal warning is issued and documented in the employee’s file, remaining active for a specified period (e.g., six months).</li>
+                    <li><strong>Written Warning:</strong> For repeated or more serious offenses, a written warning is issued, detailing the misconduct, corrective action required, and the period the warning remains active. The employee is informed of their right to appeal.</li>
+                    <li><strong>Final Written Warning:</strong> Issued for further misconduct or more serious breaches, with clear notice that further issues may result in termination.</li>
+                    <li><strong>Suspension or Demotion:</strong> For certain offenses, suspension without pay (up to a specified maximum) or demotion may be considered as alternatives to termination.</li>
+                    <li><strong>Termination:</strong> Dismissal may occur for continued misconduct, failure to improve, or in cases of gross misconduct (e.g., theft, violence, serious safety violations). In cases of gross misconduct, summary dismissal without notice may occur after investigation and a hearing.</li>
+                </ul>
+                <p><strong>Appeals:</strong></p>
+                <p>Employees have the right to appeal disciplinary actions. Appeals should be submitted in writing within a specified period (e.g., seven days) and will be reviewed by management or HR. The decision after appeal is final.</p>
+                <h4>Training</h4>
+                <p>Train supervisors and managers on the disciplinary process, documentation, and legal compliance.</p>
+                <p>Inform employees of the disciplinary process during orientation and through the employee handbook.</p>
+                <h4>Documentation</h4>
+                <p>Maintain records of all disciplinary actions, including investigation notes, warnings, and appeal outcomes, in the employee’s personnel file.</p>
+                <p>Ensure documentation is clear, factual, and retained according to company policy and legal requirements.</p>
+                <h4>Program Review</h4>
+                <p>Review and update the disciplinary action program at least annually or after significant incidents or changes in law.</p>
+                <p>Solicit feedback from supervisors and employees to improve fairness and effectiveness.</p>
+                <p>Document each review, noting changes made and reasons for those changes.</p>`
+            },
             electrical: {
                 title: 'Electrical Safety Program',
                 body: `<h4>Responsibilities</h4><p><strong>Director/Safety Officer:</strong> Ensures only qualified persons perform electrical work…</p><h4>Program Review</h4><p>Annual review.</p>`
@@ -391,7 +450,6 @@
                 <p>Provide initial emergency action training for all employees upon hire and refresher training annually or when procedures change.</p>
                 <p>Conduct regular emergency drills (at least annually) for all types of emergencies covered by the plan.</p>
                 <p>Train employees on alarm recognition, evacuation routes, assembly points, and reporting procedures.</p>
-                <p>Document all training sessions, including date, attendees, and topics covered.</p>
                 <h4>Documentation</h4>
                 <p>Maintain records of:</p>
                 <ul>
@@ -497,9 +555,10 @@
                 <h4>Training</h4>
                 <p>Provide initial and refresher training to all employees exposed to fall hazards, covering:</p>
                 <ul>
-                    <li>Recognition of fall hazards</li>
-                    <li>Proper use, inspection, and maintenance of fall protection equipment</li>
-                    <li>Procedures for working at heights and emergency response</li>
+                    <li>Recognizing workplace violence hazards</li>
+                    <li>Reporting procedures and employee rights</li>
+                    <li>Emergency response and evacuation protocols</li>
+                    <li>Roles and responsibilities under the WVPP</li>
                 </ul>
                 <p>Ensure competent persons and supervisors receive advanced training in hazard assessment and system selection.</p>
                 <p>Document all training sessions, including date, attendees, and topics covered.</p>
@@ -748,7 +807,7 @@
                     <li>Maintenance and repair logs</li>
                     <li>Incident and corrective action reports</li>
                 </ul>
-                <p>Store documentation securely and make available for regulatory review as required by Cal/OSHA.</p>
+                <p>Store documentation securely and make available for regulatory review as required. </p>
                 <h4>Program Review</h4>
                 <p>Review and update the Forklift Safety Program at least annually, after incidents, or when regulations or workplace conditions change.</p>
                 <p>Solicit feedback from operators and supervisors to improve effectiveness.</p>
@@ -912,7 +971,7 @@
                     <li>Training records</li>
                     <li>Inspection and maintenance logs</li>
                 </ul>
-                <p>Store records securely and make available for regulatory review as required by Cal/OSHA.</p>
+                <p>Store records securely and make available for regulatory review as required.</p>
                 <h4>Program Review</h4>
                 <p>Review and update the Respiratory Protection Program at least annually, after incidents, or when regulations, workplace conditions, or equipment change.</p>
                 <p>Solicit feedback from employees and supervisors to improve effectiveness.</p>
@@ -1059,7 +1118,8 @@
         const manualHeaderCompany = document.getElementById('manualHeaderCompany');
         const checkboxListDiv = document.getElementById('checkboxList');
         const programsContainer = document.getElementById('programsContainer');
-        const downloadManualBtn = document.getElementById('downloadManualBtn'); // Get the new button
+        const downloadManualBtn = document.getElementById('downloadManualBtn');
+        const printPdfBtn = document.getElementById('printPdfBtn'); // New: Get the print button
         const tocList = document.getElementById('tocList'); // Get the TOC list element
 
         // Function to update the manual content and TOC
@@ -1166,6 +1226,12 @@
             URL.revokeObjectURL(link.href); // Clean up the URL object
         }
 
+        // Function to handle printing the manual
+        function printManual() {
+            window.print(); // Triggers the browser's native print dialog
+        }
+
+
         // Populate checkboxes dynamically and attach event listeners
         function populateCheckboxes() {
             // Convert templates object to an array of [key, value] pairs
@@ -1204,6 +1270,8 @@
             companyNameInput.addEventListener('input', updateManual);
             // Attach event listener for download button
             downloadManualBtn.addEventListener('click', downloadManual);
+            // New: Attach event listener for print button
+            printPdfBtn.addEventListener('click', printManual);
             // Perform an initial update to render the disclaimer and any default content
             updateManual();
         });
