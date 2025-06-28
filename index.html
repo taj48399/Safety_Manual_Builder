@@ -1,0 +1,1212 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Safety Manual Builder</title>
+    <!-- Tailwind CSS CDN for utility classes -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Custom CSS variables for theme */
+        :root {
+            --primary-bg: #f9fafb; /* gray-50 */
+            --secondary-bg: #ffffff; /* white */
+            --accent-bg: #eff6ff; /* blue-50 */
+            --border-color: #e5e7eb; /* gray-200 */
+            --text-color: #1f2937; /* gray-900 */
+            --heading-color: #111827; /* gray-900 */
+            --shadow-color: rgba(0, 0, 0, 0.05);
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--primary-bg);
+            color: var(--text-color);
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Basic styling for headings inside program cards */
+        .manual-content h4 {
+            font-size: 1.25rem; /* text-xl */
+            font-weight: 600; /* font-semibold */
+            color: var(--heading-color);
+            margin-top: 1.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .manual-content p, .manual-content ul, .manual-content ol {
+            margin-bottom: 1rem;
+            line-height: 1.6;
+        }
+
+        .manual-content ul {
+            list-style-type: disc;
+            margin-left: 1.5rem;
+        }
+
+        .manual-content ol {
+            list-style-type: decimal;
+            margin-left: 1.5rem;
+        }
+
+        /* Styling for the program cards */
+        .card {
+            background-color: var(--secondary-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 0.5rem; /* rounded-lg */
+            box-shadow: 0 1px 3px 0 var(--shadow-color), 0 1px 2px -1px var(--shadow-color); /* shadow-sm */
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        /* Table of Contents specific styling */
+        #tableOfContents ul {
+            list-style-type: none;
+            padding-left: 0;
+        }
+
+        #tableOfContents li {
+            margin-bottom: 0.5rem;
+        }
+
+        #tableOfContents a {
+            color: #2563eb; /* blue-600 */
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        #tableOfContents a:hover {
+            text-decoration: underline;
+        }
+
+        /* Hide disclaimer when printing */
+        @media print {
+            .disclaimer-card {
+                display: none;
+            }
+        }
+    </style>
+</head>
+<body class="flex flex-col md:flex-row">
+
+    <!-- Left Sidebar for Controls -->
+    <aside class="w-full md:w-1/4 bg-white p-6 md:p-8 border-b md:border-r border-gray-200 shadow-sm md:shadow-none flex flex-col space-y-6">
+        <h2 class="text-2xl font-bold text-gray-900 mb-4">Manual Builder</h2>
+
+        <!-- Step 1: Company Name -->
+        <div>
+            <h3 class="text-lg font-medium text-gray-900 mb-3">Step 1: Company Name</h3>
+            <input type="text" id="companyName" placeholder="Your Company, Inc." class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
+        </div>
+
+        <!-- Step 2: Program Selector -->
+        <div>
+            <h3 class="text-lg font-medium text-gray-900 mb-3">Step 2: Select Programs</h3>
+            <div id="checkboxList" class="space-y-2">
+                <!-- Checkboxes will be dynamically inserted here by JavaScript -->
+            </div>
+        </div>
+
+        <!-- Download Button -->
+        <div class="mt-6">
+            <button id="downloadManualBtn" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-md shadow-md transition duration-300 ease-in-out transform hover:scale-105">
+                Download Manual (Text)
+            </button>
+        </div>
+    </aside>
+
+    <!-- Right Content Area for Manual Preview -->
+    <main class="flex-1 p-6 md:p-8 bg-gray-50 overflow-auto">
+        <h1 class="text-3xl md:text-4xl font-extrabold text-gray-900 mb-6 text-center">
+            <span id="manualHeaderCompany">[Company Name]</span> Safety Manual
+        </h1>
+
+        <!-- Disclaimer Card -->
+        <div class="card mb-6 bg-yellow-50 border-yellow-200 text-yellow-800 disclaimer-card">
+            <h4 class="text-xl font-semibold mb-2 text-yellow-900">Disclaimer: Important Notice</h4>
+            <p class="text-sm">
+                This document is provided for informational purposes only. Employers must verify all content for accuracy, completeness, and compliance with all applicable federal, state, and local regulations. This builder does not constitute legal or safety advice, and [Company Name] (placeholder) assumes no liability for its use. Always consult with qualified legal and safety professionals to ensure full compliance.
+            </p>
+        </div>
+
+        <!-- Table of Contents Placeholder -->
+        <div id="tableOfContents" class="card mb-6 bg-blue-50 border-blue-200 text-blue-800">
+            <h3 class="text-xl font-semibold mb-3 text-blue-900">Table of Contents</h3>
+            <ul id="tocList">
+                <!-- TOC items will be injected here -->
+            </ul>
+        </div>
+
+        <!-- Programs will be injected here -->
+        <div id="programsContainer" class="manual-content">
+            <!-- Program cards will appear here -->
+        </div>
+    </main>
+
+    <script>
+        // Data for safety programs
+        const templates = {
+            accident: {
+                title: 'Injury & Illness Prevention Program (IIPP)',
+                body: `<h4>Scope</h4>
+                <p>This Injury and Illness Prevention Program (IIPP) applies to all employees and operations conducted by [Company Name], including metal stud framing, drywall installation, plaster, taping, and painting activities. The program is designed to comply with California Code of Regulations, Title 8, Section 3203, and is applicable to all worksites operated by the company, regardless of size (10 or fewer employees, scalable up to 50).</p>
+                <h4>Responsibilities</h4>
+                <p><strong>Director/Safety Officer:</strong> Responsible for implementing, maintaining, and updating the IIPP. Ensures all employees are trained, hazards are identified and corrected, and records are maintained.</p>
+                <p><strong>Supervisors/Foremen:</strong> Responsible for enforcing safe work practices, conducting inspections, and reporting hazards or incidents to management.</p>
+                <p><strong>Employees:</strong> Responsible for following safe work practices, attending required training, reporting hazards or unsafe conditions, and cooperating with all safety procedures.</p>
+                <h4>Program Details</h4>
+                <ol>
+                    <li><strong>Hazard Identification and Evaluation</strong><p>Conduct regular workplace inspections (at least quarterly).</p>
+                        <p>Identify and evaluate workplace hazards, including unsafe conditions and work practices.</p>
+                        <p>Document findings and corrective actions taken.</p></li>
+                    <li><strong>Hazard Correction</strong><p>Correct identified hazards as soon as possible, based on the severity of the hazard.</p>
+                        <p>Remove employees from exposure to imminent hazards until corrected.</p></li>
+                    <li><strong>Communication</strong><p>Communicate safety policies and procedures to all employees.</p>
+                        <p>Encourage employees to report hazards without fear of reprisal.</p>
+                        <p>Post safety information in common areas and provide regular safety meetings (tailgate/toolbox talks).</p></li>
+                    <li><strong>Accident/Exposure Investigation</strong><p>Investigate all workplace injuries, illnesses, and near-miss incidents promptly.</p>
+                        <p>Identify root causes and implement corrective actions to prevent recurrence.</p></li>
+                    <li><strong>Compliance</strong><p>Enforce safe work practices through training, supervision, and disciplinary action when necessary.</p>
+                        <p>Recognize employees who follow safe work practices.</p></li>
+                </ol>
+                <h4>Training</h4>
+                <p>Provide initial safety orientation for all new employees.</p>
+                <p>Conduct ongoing training on specific hazards, safe work practices, and emergency procedures.</p>
+                <p>Document all training sessions, including date, topics covered, and employee signatures.</p>
+                <p>Provide refresher training as needed and when new hazards are introduced.</p>
+                <h4>Documentation</h4>
+                <p>Maintain the following records for at least three years:</p>
+                <ul>
+                    <li>Safety meeting minutes and attendance</li>
+                    <li>Workplace inspection reports</li>
+                    <li>Accident/incident investigation reports</li>
+                    <li>Hazard correction records</li>
+                    <li>Employee training records</li>
+                </ul>
+                <p>Store documentation in a secure, accessible location at the main office.</p>
+                <h4>Program Review</h4>
+                <p>Review and update the IIPP at least annually or whenever new hazards are introduced, processes change, or incidents occur.</p>
+                <p>Solicit employee feedback to improve the effectiveness of the program.</p>
+                <p>Document the date and results of each program review.</p>`
+            },
+            code_safe: {
+                title: 'Code of Safe Practices',
+                body: `<h4>General Safety</h4>
+                <ul>
+                    <li>Report all unsafe conditions, equipment, or practices to your supervisor immediately.</li>
+                    <li>Do not perform any task unless you have been trained and authorized.</li>
+                    <li>Always use personal protective equipment (PPE) as required (e.g., hard hats, safety glasses, gloves, hearing protection).</li>
+                    <li>Maintain good housekeeping—keep work areas clean, dry, and free of debris.</li>
+                    <li>Know the location of first aid kits, fire extinguishers, and emergency exits.</li>
+                </ul>
+                <h4>Worksite Conduct</h4>
+                <ul>
+                    <li>Horseplay, fighting, or practical jokes are strictly prohibited.</li>
+                    <li>Do not report to work under the influence of drugs or alcohol.</li>
+                    <li>Follow all posted warning signs and instructions.</li>
+                </ul>
+                <h4>Tools and Equipment</h4>
+                <ul>
+                    <li>Inspect all tools and equipment before use; do not use damaged or defective items.</li>
+                    <li>Use the right tool for the job and operate it according to manufacturer instructions.</li>
+                    <li>Disconnect power tools when not in use, before servicing, or when changing accessories.</li>
+                </ul>
+                <h4>Ladders and Scaffolds</h4>
+                <ul>
+                    <li>Inspect ladders and scaffolds before each use.</li>
+                    <li>Set up ladders on stable, level surfaces; do not stand on the top step.</li>
+                    <li>Use guardrails and fall protection as required when working on scaffolds or elevated surfaces.</li>
+                </ul>
+                <h4>Material Handling</h4>
+                <ul>
+                    <li>Use proper lifting techniques: bend at the knees, keep your back straight, and lift with your legs.</li>
+                    <li>Get help or use mechanical aids for heavy or awkward loads.</li>
+                    <li>Store materials securely to prevent shifting or falling.</li>
+                </ul>
+                <h4>Hazardous Materials</h4>
+                <ul>
+                    <li>Read and follow all labels and Safety Data Sheets (SDS) for chemicals and hazardous materials.</li>
+                    <li>Store chemicals in designated areas and use appropriate PPE.</li>
+                    <li>Report spills or exposures immediately and follow proper cleanup procedures.</li>
+                </ul>
+                <h4>Fire Prevention</h4>
+                <ul>
+                    <li>Do not block fire exits or access to fire extinguishers.</li>
+                    <li>Store flammable materials away from ignition sources.</li>
+                    <li>Dispose of oily rags and combustible waste in approved containers.</li>
+                </ul>
+                <h4>Heat Illness Prevention</h4>
+                <ul>
+                    <li>Drink water frequently and take breaks in shaded or cool areas during hot conditions.</li>
+                    <li>Recognize symptoms of heat illness (dizziness, headache, nausea) and report them immediately.</li>
+                    <li>Follow company procedures for indoor and outdoor heat illness prevention.</li>
+                </ul>
+                <h4>Emergency Procedures</h4>
+                <ul>
+                    <li>Know the company’s emergency action plan and evacuation routes.</li>
+                    <li>Report all injuries, no matter how minor, to your supervisor immediately.</li>
+                    <li>Participate in emergency drills and training.</li>
+                </ul>
+                <h4>Compliance</h4>
+                <ul>
+                    <li>Follow all Cal/OSHA regulations and company safety policies at all times.</li>
+                    <li>Attend required safety meetings and training sessions.</li>
+                    <li>Cooperate fully with safety inspections and investigations.</li>
+                </ul>
+                <h4>Acknowledgment</h4>
+                <p>All employees are required to read, understand, and adhere to this Code of Safe Practices. Failure to comply may result in disciplinary action, up to and including termination.</p>
+                <p>This Code of Safe Practices should be reviewed regularly and updated as needed to reflect changes in operations, equipment, or regulations</p>`
+            },
+            caz: {
+                title: 'Controlled Access Zone (CAZ) Safety Program',
+                body: `<h4>Responsibilities</h4>
+                <p><strong>Director/Safety Officer:</strong> Responsible for establishing, maintaining, and enforcing the Controlled Access Zone (CAZ) program. Ensures all signage, barriers, and procedures comply with Cal/OSHA requirements and that only authorized personnel enter designated areas.</p>
+                <p><strong>Supervisors/Foremen:</strong> Oversee daily implementation of the CAZ, ensure barriers and warning signs are in place, and monitor worker compliance. Report breaches or unsafe conditions immediately.</p>
+                <p><strong>Employees:</strong> Required to understand the boundaries and rules of the CAZ, follow all posted instructions, and refrain from entering unless authorized and trained.</p>
+                <h4>Program Details</h4>
+                <ul>
+                    <li>Clearly define and mark CAZ boundaries with physical barriers, tape, or signage that meets Cal/OSHA standards.</li>
+                    <li>Limit entry to the CAZ to only those employees who are trained and authorized to perform work within the area.</li>
+                    <li>Assign a competent person to supervise activities within the CAZ at all times.</li>
+                    <li>Prohibit storage of materials or equipment in a manner that would obstruct access or emergency egress.</li>
+                    <li>Immediately correct any breaches of the CAZ protocol and document corrective actions taken.</li>
+                </ul>
+                <h4>Training</h4>
+                <p>Provide initial and refresher training to all employees who may work in or near a CAZ, covering:</p>
+                <ul>
+                    <li>The purpose and boundaries of the CAZ.</li>
+                    <li>Hazards associated with work performed in the CAZ.</li>
+                    <li>Procedures for entering, working in, and exiting the CAZ.</li>
+                    <li>Emergency procedures specific to the CAZ.</li>
+                </ul>
+                <p>Maintain training materials that emphasize assessment and defensibility of training content.</p>
+                <p>Document all training sessions, including attendee names, dates, and topics covered.</p>
+                <h4>Documentation</h4>
+                <p>Maintain records of:</p>
+                <ul>
+                    <li>CAZ designations, including maps or diagrams.</li>
+                    <li>Daily inspections of barriers and signage.</li>
+                    <li>Incident reports related to CAZ breaches or near-misses.</li>
+                    <li>Training records for all authorized personnel.</li>
+                </ul>
+                <p>Store documentation securely and make it available for inspection as required by Cal/OSHA.</p>
+                <h4>Program Review</h4>
+                <p>Review the CAZ program at least annually, or after any incident, regulatory change, or significant change in site operations.</p>
+                <p>Solicit feedback from supervisors and employees to improve effectiveness.</p>
+                <p>Document each review, noting any changes made and the rationale for those changes</p>`
+            },
+            cranes: {
+                title: 'Cranes Safety Program',
+                body: `<h4>Responsibilities</h4>
+                <p><strong>Director/Safety Officer:</strong> Responsible for developing, implementing, and maintaining the Cranes Safety Program. Ensures all crane operations comply with Cal/OSHA regulations and that only qualified personnel operate cranes.</p>
+                <p><strong>Supervisors/Foremen:</strong> Oversee daily crane operations, verify operator qualifications, ensure pre-operation inspections are completed, and monitor for safe work practices. Report any unsafe conditions or incidents immediately.</p>
+                <p><strong>Crane Operators:</strong> Must be trained, certified, and authorized to operate cranes. Responsible for conducting pre-use inspections, following all safety procedures, and reporting equipment defects or safety concerns.</p>
+                <p><strong>Signal Persons/Riggers:</strong> Must be trained and competent in their roles. Responsible for safe rigging practices and clear communication with crane operators.</p>
+                <h4>Program Details</h4>
+                <ul>
+                    <li>Only qualified and certified operators are permitted to operate cranes.</li>
+                    <li>Conduct daily pre-operation inspections of cranes, rigging, and lifting equipment. Remove defective equipment from service immediately.</li>
+                    <li>Establish and clearly mark crane operating zones, ensuring only authorized personnel are present.</li>
+                    <li>Use proper rigging techniques and inspect all slings, hooks, and hardware before each use.</li>
+                    <li>Maintain clear communication between operators, signal persons, and ground crew using standard hand signals or radios.</li>
+                    <li>Never exceed the crane’s rated load capacity. Consult load charts and consider all factors (e.g., boom angle, radius, ground conditions).</li>
+                    <li>Maintain safe distances from power lines and other hazards as required by Cal/OSHA.</li>
+                    <li>Prohibit work under suspended loads and ensure loads are secured before lifting.</li>
+                    <li>Stop operations immediately if unsafe conditions arise.</li>
+                </ul>
+                <h4>Training</h4>
+                <p>Provide initial and refresher training for all crane operators, riggers, and signal persons, including:</p>
+                <ul>
+                    <li>Crane operation and safety procedures</li>
+                    <li>Equipment inspection and maintenance</li>
+                    <li>Load chart interpretation and capacity limits</li>
+                    <li>Rigging and signaling techniques</li>
+                    <li>Emergency response procedures</li>
+                </ul>
+                <p>Document all training sessions, including participant names, dates, and topics covered.</p>
+                <p>Ensure operators maintain current certification as required by Cal/OSHA.</p>
+                <h4>Documentation</h4>
+                <p>Maintain records of:</p>
+                <ul>
+                    <li>Crane operator certifications and training</li>
+                    <li>Daily and periodic crane inspection checklists</li>
+                    <li>Rigging and lifting equipment inspection logs</li>
+                    <li>Incident and near-miss reports related to crane operations</li>
+                </ul>
+                <p>Store documentation securely and make it available for regulatory review.</p>
+                <h4>Program Review</h4>
+                <p>Review the Cranes Safety Program at least annually, or after any incident, regulatory change, or significant operational change.</p>
+                <p>Solicit feedback from operators, riggers, and supervisors to identify areas for improvement.</p>
+                <p>Document each review, noting changes made and and reasons for those changes.</p>`
+            },
+            electrical: {
+                title: 'Electrical Safety Program',
+                body: `<h4>Responsibilities</h4><p><strong>Director/Safety Officer:</strong> Ensures only qualified persons perform electrical work…</p><h4>Program Review</h4><p>Annual review.</p>`
+            },
+            emergency: {
+                title: 'Emergency Action Plan (EAP)',
+                body: `<h4>Responsibilities</h4>
+                <p><strong>Director/Safety Officer:</strong> Develops, implements, and maintains the Emergency Action Plan (EAP). Ensures all employees are trained and the plan is reviewed and updated regularly. Coordinates with local emergency services as needed.</p>
+                <p><strong>Supervisors/Foremen:</strong> Communicate emergency procedures to employees, ensure evacuation routes and emergency equipment are accessible, and account for all personnel during emergencies.</p>
+                <p><strong>Employees:</strong> Know and follow all emergency procedures, participate in emergency drills, and report hazards or emergencies immediately to supervisors.</p>
+                <h4>Program Details</h4>
+                <p><strong>Emergency Types Covered:</strong></p>
+                <ul>
+                    <li>Fire, medical emergencies, chemical spills, earthquakes, severe weather, workplace violence, and other site-specific emergencies.</li>
+                </ul>
+                <p><strong>Alarm Systems:</strong></p>
+                <ul>
+                    <li>Clearly audible/visible alarms will be used to alert employees of an emergency. All employees must recognize the alarm signals.</li>
+                </ul>
+                <p><strong>Evacuation Procedures:</strong></p>
+                <ul>
+                    <li>Identify and post primary and secondary evacuation routes and assembly points.</li>
+                    <li>Assign evacuation wardens to assist with orderly evacuation and account for all personnel.</li>
+                    <li>Ensure exits are clearly marked and unobstructed at all times.</li>
+                </ul>
+                <p><strong>Emergency Contacts:</strong></p>
+                <ul>
+                    <li>Maintain a current list of emergency contacts, including local fire, police, ambulance, and company management.</li>
+                </ul>
+                <p><strong>Medical Response:</strong></p>
+                <ul>
+                    <li>Provide first aid kits and ensure trained first aid responders are available.</li>
+                    <li>Designate locations for medical assistance and procedures for contacting emergency services.</li>
+                </ul>
+                <p><strong>Fire Response:</strong></p>
+                <ul>
+                    <li>Identify locations of fire extinguishers and train employees in their use.</li>
+                    <li>Ensure employees know not to use elevators during a fire evacuation.</li>
+                </ul>
+                <p><strong>Special Procedures:</strong></p>
+                <ul>
+                    <li>Address procedures for employees with disabilities or special needs.</li>
+                    <li>Include shutdown procedures for critical operations, if applicable.</li>
+                </ul>
+                <h4>Training</h4>
+                <p>Provide initial emergency action training for all employees upon hire and refresher training annually or when procedures change.</p>
+                <p>Conduct regular emergency drills (at least annually) for all types of emergencies covered by the plan.</p>
+                <p>Train employees on alarm recognition, evacuation routes, assembly points, and reporting procedures.</p>
+                <p>Document all training sessions, including date, attendees, and topics covered.</p>
+                <h4>Documentation</h4>
+                <p>Maintain records of:</p>
+                <ul>
+                    <li>Emergency drills and training sessions</li>
+                    <li>Emergency contact lists</li>
+                    <li>Incident reports and after-action reviews</li>
+                    <li>Updates and revisions to the EAP</li>
+                </ul>
+                <p>Store documentation in an accessible location and make available for inspection as required by Cal/OSHA.</p>
+                <h4>Program Review</h4>
+                <p>Review the Emergency Action Plan at least annually, after drills, or following any emergency incident.</p>
+                <p>Update the plan as needed to reflect changes in personnel, site layout, operations, or regulations.</p>
+                <p>Solicit feedback from employees and supervisors to identify improvements.</p>
+                <p>Document each review, including date, participants, findings, and any changes made.</p>
+                <p>This Emergency Action Plan is designed to ensure the safety of all employees and visitors by providing clear procedures for responding to emergencies and complying with Cal/OSHA requirements.</p>`
+            },
+            excavation: {
+                title: 'Excavation & Trenching Safety Program',
+                body: `<h4>Responsibilities</h4>
+                <p><strong>Director/Safety Officer:</strong> Develops, implements, and maintains the Excavation & Trenching Safety Program. Ensures compliance with Cal/OSHA and OSHA standards, secures required permits, and provides resources and training.</p>
+                <p><strong>Competent Person:</strong> Conducts daily inspections of excavations, trenches, and protective systems. Identifies hazards such as cave-ins, hazardous atmospheres, and falling loads, and ensures corrective actions are taken before work begins and as conditions change.</p>
+                <p><strong>Supervisors/Foremen:</strong> Verify that all protective systems are in place, ensure safe access and egress, and monitor employee compliance with safety procedures.</p>
+                <p><strong>Employees:</strong> Follow all trenching and excavation safety rules, use provided protective systems, and report hazards or unsafe conditions immediately.</p>
+                <h4>Program Details</h4>
+                <p><strong>Pre-Excavation Planning:</strong></p>
+                <ul>
+                    <li>Identify and mark the location of all underground utilities before digging.</li>
+                    <li>Notify utility companies and obtain clearances at least two working days before excavation begins.</li>
+                    <li>Secure required Cal/OSHA permits for excavations 5 feet or deeper that workers will enter.</li>
+                </ul>
+                <p><strong>Protective Systems:</strong></p>
+                <ul>
+                    <li>Trenches 5 feet or deeper require a protective system (shoring, shielding, sloping, or benching), unless in stable rock.</li>
+                    <li>Trenches deeper than 20 feet require a protective system designed by a registered professional engineer.</li>
+                    <li>Keep excavated soil (spoil piles) and equipment at least 2 feet from the trench edge.</li>
+                </ul>
+                <p><strong>Access and Egress:</strong></p>
+                <ul>
+                    <li>Provide ladders, ramps, or other safe means of egress for trenches 4 feet or deeper, so no worker travels more than 25 feet laterally to exit.</li>
+                </ul>
+                <p><strong>Inspections:</strong></p>
+                <ul>
+                    <li>A competent person must inspect trenches daily and as conditions change for signs of cave-ins, protective system failure, hazardous atmospheres, and other hazards.</li>
+                </ul>
+                <p><strong>Hazard Controls:</strong></p>
+                <ul>
+                    <li>Test for hazardous atmospheres in trenches over 4 feet deep where oxygen deficiency or hazardous gases are possible.</li>
+                    <li>Protect workers from falling loads and mobile equipment.</li>
+                    <li>Prohibit employees from working under raised loads or near unprotected trench edges.</li>
+                </ul>
+                <h4>Training</h4>
+                <p>Provide training to all employees involved in excavation and trenching activities on:</p>
+                <ul>
+                    <li>Hazard recognition (cave-ins, hazardous atmospheres, underground utilities)</li>
+                    <li>Use of protective systems and safe access/egress</li>
+                    <li>Emergency procedures and reporting requirements</li>
+                </ul>
+                <p>Ensure competent persons receive specialized training in soil classification, protective system selection, and regulatory compliance.</p>
+                <p>Document all training sessions, including date, attendees, and topics covered.</p>
+                <h4>Documentation</h4>
+                <p>Maintain records of:</p>
+                <ul>
+                    <li>Pre-excavation utility notifications and clearances</li>
+                    <li>Cal/OSHA permits for deep excavations</li>
+                    <li>Daily inspection reports by the competent person</li>
+                    <li>Training records for all employees</li>
+                    <li>Incident and corrective action reports</li>
+                </ul>
+                <p>Store documentation securely and make available for regulatory review.</p>
+                <h4>Program Review</h4>
+                <p>Review the Excavation & Trenching Safety Program at least annually, after incidents, or when regulations or site conditions change.</p>
+                <p>Update procedures and training as needed based on new hazards, feedback, or regulatory updates.</p>
+                <p>Document each review, noting changes made and reasons for those changes</p>`
+            },
+            fall: {
+                title: 'Fall Protection Program',
+                body: `<h4>Responsibilities</h4>
+                <p><strong>Director/Safety Officer:</strong> Develops, implements, and maintains the Fall Protection Program. Ensures compliance with Cal/OSHA regulations, provides resources and equipment, and oversees program audits and updates.</p>
+                <p><strong>Supervisors/Foremen:</strong> Ensure all affected employees receive required fall protection training before working at heights, enforce use of fall protection systems, monitor work areas for hazards, and stop work if deficiencies are identified.</p>
+                <p><strong>Competent Person:</strong> Evaluates worksites for fall hazards, selects appropriate fall protection systems, and conducts regular inspections of equipment and work practices.</p>
+                <p><strong>Employees:</strong> Follow all fall protection procedures, use assigned equipment properly, attend training, and report hazards or unsafe conditions immediately.</p>
+                <h4>Program Details</h4>
+                <p><strong>Trigger Heights:</strong></p>
+                <ul>
+                    <li>Fall protection is required for construction work at heights of 6 feet or more, and for certain tasks at lower thresholds (e.g., 7½ feet for unprotected platforms or edges, 15 feet for panelized roof systems).</li>
+                </ul>
+                <p><strong>Protection Methods:</strong></p>
+                <ul>
+                    <li>Use guardrails, safety nets, or personal fall arrest systems as the primary means of fall protection. Where these are not feasible, implement alternative measures such as scaffolds, ladders, or controlled access zones in accordance with Cal/OSHA requirements.</li>
+                </ul>
+                <p><strong>Hazard Identification:</strong></p>
+                <ul>
+                    <li>Identify and assess all locations and tasks where fall hazards exist, including roofs, scaffolds, ladders, platforms, and open edges.</li>
+                </ul>
+                <p><strong>Equipment Inspection:</strong></p>
+                <ul>
+                    <li>Inspect all fall protection equipment (harnesses, lanyards, anchor points) before each use and remove defective equipment from service.</li>
+                </ul>
+                <p><strong>Incident Response:</strong></p>
+                <ul>
+                    <li>Investigate all falls, near-misses, or related incidents to determine root causes and implement corrective actions, including updates to procedures or additional training as needed.</li>
+                </ul>
+                <h4>Training</h4>
+                <p>Provide initial and refresher training to all employees exposed to fall hazards, covering:</p>
+                <ul>
+                    <li>Recognition of fall hazards</li>
+                    <li>Proper use, inspection, and maintenance of fall protection equipment</li>
+                    <li>Procedures for working at heights and emergency response</li>
+                </ul>
+                <p>Ensure competent persons and supervisors receive advanced training in hazard assessment and system selection.</p>
+                <p>Document all training sessions, including date, attendees, and topics covered.</p>
+                <h4>Documentation</h4>
+                <p>Maintain records of:</p>
+                <ul>
+                    <li>Fall hazard assessments and site-specific plans</li>
+                    <li>Equipment inspections and maintenance logs</li>
+                    <li>Training records for all affected employees</li>
+                    <li>Incident and corrective action reports</li>
+                </ul>
+                <p>Store documentation securely and make available for regulatory review as required.</p>
+                <h4>Program Review</h4>
+                <p>Review the Fall Protection Program at least annually, after any incident, or when regulations or work practices change.</p>
+                <p>Update procedures and training based on new hazards, feedback, or changes in Cal/OSHA standards.</p>
+                <p>Document each review, noting changes made and the reasons for those changes.</p>`
+            },
+            fire: {
+                title: 'Fire Protection & Prevention Program',
+                body: `<h4>Responsibilities</h4>
+                <p><strong>Director/Safety Officer:</strong> Develops, implements, and maintains the Fire Protection & Prevention Program in compliance with Cal/OSHA and OSHA requirements. Oversees hazard assessments, ensures fire protection equipment is maintained, and updates the program as needed.</p>
+                <p><strong>Supervisors/Foremen:</strong> Ensure employees follow fire prevention procedures, maintain good housekeeping, oversee safe storage and handling of flammable materials, and report hazards or incidents.</p>
+                <p><strong>Employees:</strong> Follow all fire safety procedures, participate in required training, use fire protection equipment as instructed, and report unsafe conditions or fire hazards immediately.</p>
+                <h4>Program Details</h4>
+                <p><strong>Identification and Control of Hazards:</strong></p>
+                <ul>
+                    <li>Identify potential fire hazards, including flammable and combustible materials, ignition sources (e.g., welding, smoking, electrical), and hazardous processes.</li>
+                    <li>Store and handle flammable and combustible materials according to established procedures and regulatory requirements.</li>
+                    <li>Control ignition sources by enforcing hot work permit procedures, prohibiting unauthorized smoking, and maintaining electrical safety.</li>
+                    <li>Maintain fire protection equipment (extinguishers, alarms, sprinklers) and ensure it is accessible and operational.</li>
+                </ul>
+                <p><strong>Housekeeping:</strong></p>
+                <ul>
+                    <li>Control accumulation of flammable and combustible waste materials and residues so they do not contribute to a fire emergency.</li>
+                    <li>Include housekeeping procedures in the written fire prevention plan and ensure regular cleaning of work areas.</li>
+                </ul>
+                <p><strong>Equipment Maintenance:</strong></p>
+                <ul>
+                    <li>Regularly inspect and maintain equipment and systems installed to prevent or control ignitions or fires, following established maintenance schedules.</li>
+                    <li>Assign responsibility for maintenance to designated personnel and document all inspections and corrective actions.</li>
+                </ul>
+                <p><strong>Hot Work Controls:</strong></p>
+                <ul>
+                    <li>Require hot work permits for welding, cutting, or other spark-producing activities.</li>
+                    <li>Inspect work areas for hazards before issuing permits and ensure fire watch is provided during and after hot work.</li>
+                </ul>
+                <p><strong>Fire Protection Systems:</strong></p>
+                <ul>
+                    <li>Provide and maintain appropriate fire extinguishers and fire suppression systems based on the hazards present.</li>
+                    <li>Ensure fire alarm systems are operational and regularly tested.</li>
+                </ul>
+                <p><strong>Emergency Procedures:</strong></p>
+                <ul>
+                    <li>Establish and communicate procedures for fire alarm activation, evacuation, and equipment shutdown.</li>
+                    <li>Post evacuation routes and designate assembly areas.</li>
+                </ul>
+                <h4>Training</h4>
+                <p>Train employees on fire hazards related to their job tasks, safe storage and handling of flammable materials, use of fire protection equipment, and emergency procedures.</p>
+                <p>Review relevant parts of the fire prevention plan with each employee upon initial assignment and whenever changes occur.</p>
+                <p>For companies with 10 or fewer employees, the plan may be communicated orally; for larger companies, maintain a written plan accessible to all employees.</p>
+                <h4>Documentation</h4>
+                <p>Maintain:</p>
+                <ul>
+                    <li>Written Fire Protection & Prevention Program (unless exempt for small employers)</li>
+                    <li>Records of fire hazard assessments, equipment inspections, and maintenance</li>
+                    <li>Training records for all employees</li>
+                    <li>Hot work permits and incident reports</li>
+                </ul>
+                <p>Store documentation securely and make it available for regulatory review as required.</p>
+                <h4>Program Review</h4>
+                <p>Review and update the Fire Protection & Prevention Program at least annually, after incidents, or when regulations or workplace conditions change.</p>
+                <p>Solicit feedback from supervisors and employees to improve effectiveness.</p>
+                <p>Document each review, noting changes made and reasons for those changes.</p>`
+            },
+            hazcom: {
+                title: 'Hazard Communication Program',
+                body: `<h4>Responsibilities</h4>
+                <p><strong>Director/Safety Officer:</strong> Develops, implements, and maintains the Hazard Communication Program (HazCom). Ensures compliance with Cal/OSHA regulations, maintains the written program, and oversees training and updates.</p>
+                <p><strong>Supervisors/Foremen:</strong> Ensure hazardous chemicals are properly labeled, Safety Data Sheets (SDSs) are accessible, and employees are trained on chemical hazards and safe handling procedures.</p>
+                <p><strong>Employees:</strong> Follow all HazCom procedures, use chemicals safely, read labels and SDSs, and report any hazards or incidents immediately.</p>
+                <h4>Program Details</h4>
+                <p><strong>Chemical Inventory:</strong></p>
+                <ul>
+                    <li>Maintain a current list of all hazardous chemicals in the workplace using product identifiers from SDSs and labels. Update the inventory as new chemicals are introduced or removed.</li>
+                </ul>
+                <p><strong>Labeling:</strong></p>
+                <ul>
+                    <li>Ensure all primary and secondary containers are labeled with the chemical identity, hazard warnings, and manufacturer information. Follow the Globally Harmonized System (GHS) for classification and labeling.</li>
+                </ul>
+                <p><strong>Safety Data Sheets (SDS):</strong></p>
+                <ul>
+                    <li>Keep an SDS for every hazardous chemical in the workplace. Ensure SDSs are readily accessible to all employees during work shifts.</li>
+                </ul>
+                <p><strong>Non-Routine Tasks & Contractors:</strong></p>
+                <ul>
+                    <li>Inform employees and contractors about chemical hazards associated with non-routine tasks and chemicals present in their work areas.</li>
+                </ul>
+                <p><strong>Warning Methods:</strong></p>
+                <ul>
+                    <li>Communicate hazards through labels, posted signs, and written warnings as required by Cal/OSHA and federal OSHA standards.</li>
+                </ul>
+                <h4>Training</h4>
+                <p>Provide training to all employees at initial assignment, when new hazards are introduced, and when new or revised SDS information is received (within 30 days).</p>
+                <p>Training topics include:</p>
+                <ul>
+                    <li>Requirements of the HazCom regulation</li>
+                    <li>Location and availability of the written program, chemical inventory, and SDSs</li>
+                    <li>Labeling systems and how to read SDSs</li>
+                    <li>How to detect the presence or release of hazardous chemicals</li>
+                    <li>Safe handling, use of PPE, and emergency response procedures</li>
+                </ul>
+                <p>Train contractors who may be exposed to hazardous chemicals on the same information as employees.</p>
+                <p>Document all training sessions, including dates, attendees, and topics covered.</p>
+                <h4>Documentation</h4>
+                <p>Maintain:</p>
+                <ul>
+                    <li>Written Hazard Communication Program</li>
+                    <li>Current chemical inventory</li>
+                    <li>SDSs for all hazardous chemicals</li>
+                    <li>Labeling records</li>
+                    <li>Training records for all employees and contractors</li>
+                </ul>
+                <p>Store documentation securely and make it available for inspection as required by Cal/OSHA.</p>
+                <h4>Program Review</h4>
+                <p>Review and update the HazCom Program at least annually, or whenever new chemicals are introduced, regulations change, or after incidents involving hazardous chemicals.</li>
+                <p>Update training and documentation as needed.</p>
+                <p>Solicit feedback from employees and supervisors to improve program effectiveness.</p>
+                <p>Document each review, including changes made and the reasons for those changes.</p>`
+            },
+            heat: {
+                title: 'Heat Illness Prevention Program',
+                body: `<h4>Responsibilities</h4>
+                <p><strong>Director/Safety Officer:</strong> Develops, implements, and maintains the Heat Illness Prevention Program (HIPP) in compliance with Cal/OSHA regulations for both indoor and outdoor workplaces. Ensures the plan is written in English and any language understood by the majority of employees, and is available at the worksite.</p>
+                <p><strong>Supervisors/Foremen:</strong> Monitor workplace temperatures, ensure water and shade/cool-down areas are accessible, enforce acclimatization and high-heat procedures, and respond to signs of heat illness.</p>
+                <p><strong>Employees:</strong> Follow heat illness prevention procedures, take cool-down breaks as needed, report symptoms of heat illness, and participate in training.</p>
+                <h4>Program Details</h4>
+                <p><strong>Provision of Water:</strong></p>
+                <ul>
+                    <li>Provide fresh, pure, and suitably cool drinking water at no cost to employees, located as close as practicable to work areas. Encourage employees to drink water frequently—at least one quart per hour.</li>
+                </ul>
+                <p><strong>Access to Shade and Cool-Down Areas:</strong></p>
+                <ul>
+                    <li>Outdoor: Provide shade when temperatures exceed 80°F. Indoor: Maintain cool-down areas below 82°F, blocked from direct sunlight and radiant heat. Areas must be large enough for all employees on break.</li>
+                </ul>
+                <p><strong>Cool-Down Rest Periods:</strong></p>
+                <ul>
+                    <li>Encourage and permit employees to take preventative cool-down breaks as needed. Monitor employees for symptoms during breaks and provide prompt first aid or emergency response if symptoms are observed.</li>
+                </ul>
+                <p><strong>High-Heat Procedures:</strong></p>
+                <ul>
+                    <li>When outdoor temperatures reach 95°F or indoor temperatures reach 87°F (or 82°F with restrictive clothing or high radiant heat), implement additional measures such as increased monitoring, mandatory cool-down breaks, and communication protocols.</li>
+                </ul>
+                <p><strong>Acclimatization:</strong></p>
+                <ul>
+                    <li>Gradually increase workloads and allow more frequent breaks for new employees or those returning after an absence. Closely observe these employees during the acclimatization period.</li>
+                </ul>
+                <p><strong>Emergency Response Procedures:</strong></p>
+                <ul>
+                    <li>Establish and communicate procedures for responding to heat illness, including contacting emergency services, providing first aid, and transporting affected employees if necessary.</li>
+                </ul>
+                <p><strong>Monitoring and Assessment:</strong></p>
+                <ul>
+                    <li>Regularly measure and record workplace temperatures or heat index as required. Evaluate non-temperature risk factors and implement engineering or administrative controls as needed.</li>
+                </ul>
+                <h4>Training</h4>
+                <p>Provide training to all employees and supervisors before work begins and annually thereafter. Training topics include:</p>
+                <ul>
+                    <li>Personal risk factors and symptoms of heat illness</li>
+                    <li>Employer procedures for water, shade, cool-down breaks, and emergency response</li>
+                    <li>Reporting procedures for symptoms or concerns</li>
+                    <li>The importance of acclimatization and how to recognize heat illness in oneself and others</li>
+                </ul>
+                <p>Document all training sessions, including date, attendees, and topics covered.</p>
+                <h4>Documentation</h4>
+                <p>Maintain:</p>
+                <ul>
+                    <li>Written Heat Illness Prevention Program (in English and any language understood by the majority)</li>
+                    <li>Records of temperature/heat index measurements (when required)</li>
+                    <li>Training records for all employees and supervisors</li>
+                    <li>Incident and corrective action reports</li>
+                </ul>
+                <p>Keep documentation accessible at the worksite for employees and Cal/OSHA upon request.</p>
+                <h4>Program Review</h4>
+                <p>Review and update the Heat Illness Prevention Program at least annually, after any incident, or when regulations or workplace conditions change.</p>
+                <p>Solicit feedback from employees and supervisors to improve effectiveness.</p>
+                <p>Document each review, noting changes made and reasons for those changes.</p>`
+            },
+            forklift: {
+                title: 'Industrial Truck (Forklift) Safety Program',
+                body: `<h4>Responsibilities</h4>
+                <p><strong>Director/Safety Officer:</strong> Develops, implements, and maintains the Forklift Safety Program in compliance with Cal/OSHA regulations. Ensures only trained and authorized personnel operate industrial trucks and oversees program updates and recordkeeping.</p>
+                <p><strong>Supervisors/Foremen:</strong> Verify that operators are trained and certified, enforce safe operating practices, monitor work areas for hazards, and report incidents or unsafe conditions.</p>
+                <p><strong>Forklift Operators:</strong> Complete required training and certification, conduct pre-operation inspections, operate forklifts safely according to procedures, and report equipment defects or hazards.</p>
+                <h4>Program Details</h4>
+                <p><strong>Operator Training and Certification:</strong></p>
+                <ul>
+                    <li>Only employees who have completed Cal/OSHA-compliant training and demonstrated competency may operate forklifts. Operators must be at least 18 years old and trained on the specific type of truck and workplace conditions.</li>
+                </ul>
+                <p><strong>Pre-Operation Inspections:</strong></p>
+                <ul>
+                    <li>Operators must inspect forklifts before each shift, checking tires, brakes, steering, horn, lights, battery, controls, and lift mechanisms. Defective trucks must be removed from service until repaired.</li>
+                </ul>
+                <p><strong>Safe Operating Practices:</strong></p>
+                <ul>
+                    <li>Always look in the direction of travel and ensure the path is clear before moving.</li>
+                    <li>Sound the horn at intersections, cross aisles, and areas with obstructed vision.</li>
+                    <li>Keep forks as low as possible while traveling and tilt loads back if applicable.</li>
+                    <li>Never exceed the rated load capacity and ensure loads are stable and secure.</li>
+                    <li>Maintain a safe distance from loading dock edges and other hazards.</li>
+                    <li>Do not allow passengers unless the forklift is designed for more than one person.</li>
+                    <li>Slow down on grades, with the load upgrade on steep inclines, and avoid sudden stops or turns.</li>
+                    <li>When leaving a forklift unattended, lower the forks, set the brakes, and shut off power; block wheels if on an incline.</li>
+                </ul>
+                <p><strong>Pedestrian and Traffic Safety:</strong></p>
+                <ul>
+                    <li>Yield the right of way to pedestrians and other vehicles.</li>
+                    <li>Do not drive up to anyone standing in front of a fixed object.</li>
+                    <li>Maintain clear aisles and avoid passing at intersections or blind spots.</li>
+                </ul>
+                <p><strong>Refueling and Charging:</strong></p>
+                <ul>
+                    <li>Follow manufacturer and site-specific procedures for safe refueling or battery charging, including proper ventilation and spill response.</li>
+                </ul>
+                <p><strong>Maintenance:</strong></p>
+                <ul>
+                    <li>Only qualified personnel may perform maintenance or repairs. All maintenance must follow manufacturer recommendations and regulatory requirements.</li>
+                </ul>
+                <h4>Training</h4>
+                <p>Provide initial and refresher training for all forklift operators, covering:</p>
+                <ul>
+                    <li>Equipment operation, inspection, and maintenance</li>
+                    <li>Load handling, stability, and capacity</li>
+                    <li>Workplace-specific hazards and surface conditions</li>
+                    <li>Safe practices around pedestrians, docks, and trailers</li>
+                    <li>Emergency procedures and accident prevention</li>
+                </ul>
+                <p>Training must include both classroom and practical (hands-on) components, with evaluation by a qualified trainer.</p>
+                <p>Retraining is required if an operator is observed operating unsafely, is involved in an accident or near-miss, or when workplace conditions or equipment change.</p>
+                <p>Document all training sessions, including operator evaluations and certifications.</p>
+                <h4>Documentation</h4>
+                <p>Maintain:</p>
+                <ul>
+                    <li>Written Forklift Safety Program</li>
+                    <li>Operator training and certification records</li>
+                    <li>Pre-operation inspection checklists</li>
+                    <li>Maintenance and repair logs</li>
+                    <li>Incident and corrective action reports</li>
+                </ul>
+                <p>Store documentation securely and make available for regulatory review as required by Cal/OSHA.</p>
+                <h4>Program Review</h4>
+                <p>Review and update the Forklift Safety Program at least annually, after incidents, or when regulations or workplace conditions change.</p>
+                <p>Solicit feedback from operators and supervisors to improve effectiveness.</p>
+                <p>Document each review, noting changes made and reasons for those changes.</p>`
+            },
+            medrecords: {
+                title: 'Medical & Exposure Records Program',
+                body: `<h4>Responsibilities</h4>
+                <p><strong>Director/Safety Officer:</strong> Develops, implements, and maintains the Medical & Exposure Records Program in compliance with Cal/OSHA Title 8 CCR §3204. Ensures records are properly retained, secured, and accessible to authorized individuals.</p>
+                <p><strong>Human Resources:</strong> Maintains pre-employment and employment medical records or informs employees of their location. Provides access to records in accordance with policy and regulatory requirements.</p>
+                <p><strong>Supervisors/Foremen:</strong> Inform employees of their rights regarding access to medical and exposure records and direct requests to the appropriate personnel.</p>
+                <p><strong>Employees:</strong> May request access to their own medical and exposure records or designate a representative to do so, following established procedures.</p>
+                <h4>Program Details</h4>
+                <p><strong>Types of Records Maintained:</strong></p>
+                <ul>
+                    <li>Medical records: medical questionnaires, examination results, laboratory tests, medical opinions/diagnoses, first-aid records, treatment descriptions, and employee medical complaints.</li>
+                    <li>Exposure records: results of workplace exposure monitoring (e.g., air sampling), records of exposure to toxic substances or harmful physical agents, and Safety Data Sheets (SDSs).</li>
+                </ul>
+                <p><strong>Retention Requirements:</strong></p>
+                <ul>
+                    <li>Medical records must be maintained for the duration of employment plus 30 years, except for employees who worked less than one year and whose records are provided to them upon termination.</li>
+                    <li>Exposure records must be maintained for at least 30 years.</li>
+                </ul>
+                <p><strong>Access Rights:</strong></p>
+                <ul>
+                    <li>Employees, their designated representatives, and Cal/OSHA representatives have the right to access and copy their medical and exposure records at no cost or to borrow them for a reasonable time to make copies. Employees must be informed of the location and availability of these records.</li>
+                </ul>
+                <h4>Training</h4>
+                <p>Train employees on their rights to access medical and exposure records, the types of records maintained, and the process for requesting access.</p>
+                <p>Supervisors and HR staff receive additional training on regulatory requirements, confidentiality, and proper record handling.</p>
+                <p>Document all training sessions, including date, attendees, and topics covered.</p>
+                <h4>Documentation</h4>
+                <p>Maintain:</p>
+                <ul>
+                    <li>Medical and exposure records as required by law</li>
+                    <li>Requests for access and authorization forms</li>
+                    <li>Training records related to this program</li>
+                </ul>
+                <p>Store all records securely and ensure confidentiality. Make records available for inspection by Cal/OSHA upon request.</p>
+                <h4>Program Review</h4>
+                <p>Review and update the Medical & Exposure Records Program at least annually, after regulatory changes, or following any incident involving record access or confidentiality.</li>
+                <p>Solicit feedback from employees and supervisors to improve procedures.</p>
+                <p>Document each review, noting changes made and reasons for those changes.</p>`
+            },
+            ppe: {
+                title: 'Personal Protective Equipment (PPE) Program',
+                body: `<h4>Responsibilities</h4><p><strong>Director/Safety Officer:</strong> Conducts hazard assessments…</p><h4>Program Review</h4><p>Annual review.</p>`
+            },
+            records: {
+                title: 'Recordkeeping & Reporting Program',
+                body: `<h4>Responsibilities</h4>
+                <p><strong>Director/Safety Officer:</strong> Oversees the Recordkeeping & Reporting Program, ensures compliance with Cal/OSHA and OSHA requirements, maintains records, and submits required reports. Adjusts procedures based on company size and regulatory exemptions.</p>
+                <p><strong>Supervisors/Foremen:</strong> Promptly report all work-related injuries, illnesses, incidents, and hazards to the Safety Officer. Assist with incident investigations and ensure accurate documentation.</p>
+                <p><strong>Employees:</strong> Immediately report all work-related injuries, illnesses, and near-misses to supervisors. Cooperate fully with reporting and investigation procedures.</p>
+                <h4>Program Details</h4>
+                <p><strong>Injury and Illness Reporting:</strong></p>
+                <ul>
+                    <li>All work-related injuries, illnesses, and incidents (including near-misses) must be reported immediately to supervisors.</li>
+                    <li>Supervisors must notify the Safety Officer, who will determine if the incident is recordable and/or reportable under Cal/OSHA/OSHA rules.</li>
+                </ul>
+                <p><strong>OSHA/Cal/OSHA Recordkeeping:</strong></p>
+                <p><strong>Companies with 10 or Fewer Employees:</strong></p>
+                <ul>
+                    <li>Generally exempt from maintaining OSHA 300, 300A, and 301 logs unless specifically required by Cal/OSHA due to industry classification or a direct request from OSHA/Cal/OSHA.</li>
+                    <li>Must still report any work-related fatalities, in-patient hospitalizations, amputations, or losses of an eye to Cal/OSHA within 8 hours.</li>
+                </ul>
+                <p><strong>Companies with More Than 10 Employees:</strong></p>
+                <ul>
+                    <li>Must maintain OSHA 300 (Log of Work-Related Injuries and Illnesses), 300A (Summary), and 301 (Incident Report) logs.</li>
+                    <li>Post the OSHA 300A summary annually from February 1 to April 30 in a visible location.</li>
+                    <li>Report any work-related fatalities, in-patient hospitalizations, amputations, or losses of an eye to Cal/OSHA within 8 hours.</li>
+                </ul>
+                <p><strong>Incident Investigation:</strong></p>
+                <ul>
+                    <li>All incidents are investigated to identify root causes and corrective actions.</li>
+                    <li>Incident reports are completed and retained as required.</li>
+                </ul>
+                <p><strong>Other Required Records:</strong></p>
+                <ul>
+                    <li>Maintain records of safety training, inspections, hazard assessments, corrective actions, and safety meetings.</li>
+                    <li>Retain medical and exposure records as required by Cal/OSHA (see Medical & Exposure Records Program).</li>
+                </ul>
+                <h4>Training</h4>
+                <p>Train supervisors and employees on:</p>
+                <ul>
+                    <li>What incidents must be reported and how to report them</li>
+                    <li>The importance of accurate and timely recordkeeping</li>
+                    <li>Company procedures for incident investigation and documentation</li>
+                </ul>
+                <p>Retrain as needed when regulations or company procedures change.</p>
+                <p>Document all training sessions, including date, attendees, and topics covered.</p>
+                <h4>Documentation</h4>
+                <p>Maintain:</p>
+                <ul>
+                    <li>OSHA 300, 300A, and 301 logs (as required by company size)</li>
+                    <li>Incident and investigation reports</li>
+                    <li>Training records</li>
+                    <li>Other safety-related documentation (inspections, hazard corrections, etc.)</li>
+                </ul>
+                <p>Store records securely and retain for the period required by law (usually 5 years for OSHA logs, 30 years for medical/exposure records).</p>
+                <p>Make records available for inspection by Cal/OSHA/OSHA upon request.</p>
+                <h4>Program Review</h4>
+                <p>Review and update the Recordkeeping & Reporting Program at least annually, after incidents, or when regulations or company size change.</p>
+                <p>Solicit feedback from supervisors and employees to improve effectiveness.</p>
+                <p>Document each review, noting changes made and reasons for those changes.</p>`
+            },
+            resp: {
+                title: 'Respiratory Protection Program (Including Silica Standard Compliance)',
+                body: `<h4>Responsibilities</h4>
+                <p><strong>Director/Safety Officer:</strong> Develops, implements, and maintains the written Respiratory Protection Program (RPP) in compliance with Cal/OSHA Title 8 §5144 and silica standards. Appoints a qualified Program Administrator and ensures all program elements are followed.</p>
+                <p><strong>Program Administrator:</strong> Oversees daily administration of the RPP, conducts hazard assessments, selects appropriate respirators, ensures medical evaluations and fit testing are completed, and maintains documentation.</p>
+                <p><strong>Supervisors/Foremen:</strong> Enforce proper respirator use, verify only medically cleared and fit-tested employees use respirators, and report any issues or incidents.</p>
+                <p><strong>Employees:</strong> Use respiratory protection as trained, participate in medical evaluations and fit testing, maintain assigned equipment, and report problems or symptoms.</p>
+                <h4>Program Details</h4>
+                <p><strong>Hazard Assessment & Control:</strong></p>
+                <ul>
+                    <li>Conduct a thorough hazard assessment to identify respiratory risks, including airborne silica and other contaminants. Implement engineering and administrative controls where feasible. Respirators are required when controls cannot reduce exposures below permissible exposure limits (PELs).</li>
+                </ul>
+                <p><strong>Respirator Selection:</strong></p>
+                <ul>
+                    <li>Select NIOSH-approved respirators appropriate for the specific hazard, contaminant concentration, and work task. For silica, use at least a half-mask air-purifying respirator with P100 filters or higher protection as required by the exposure level.</li>
+                </ul>
+                <p><strong>Medical Evaluation:</strong></p>
+                <ul>
+                    <li>Provide medical evaluations to employees required to use respirators, using the Cal/OSHA medical questionnaire and follow-up by a licensed healthcare professional. Repeat evaluations as recommended or if health status changes.</li>
+                </ul>
+                <p><strong>Fit Testing:</strong></p>
+                <ul>
+                    <li>Conduct initial and annual fit testing for all employees using tight-fitting respirators, using qualitative or quantitative methods as required by Cal/OSHA. Fit testing must be repeated whenever a different facepiece is used or facial changes occur.</li>
+                </ul>
+                <p><strong>Use, Maintenance, and Care:</strong></p>
+                <ul>
+                    <li>Train employees in proper donning, doffing, use, and user seal checks. Clean and disinfect respirators regularly, store them in a clean, dry area, and inspect before each use. Remove defective respirators from service immediately.</li>
+                </ul>
+                <p><strong>Silica-Specific Requirements:</strong></p>
+                <ul>
+                    <li>Follow Table 1 tasks and controls for silica exposure.</li>
+                    <li>Use wet methods, local exhaust, or other engineering controls before resorting to respirators.</li>
+                    <li>Ensure employees exposed to silica above the action level use appropriate respiratory protection and are included in the medical surveillance program.</li>
+                </ul>
+                <p><strong>Recordkeeping:</strong></p>
+                <ul>
+                    <li>Maintain records of hazard assessments, respirator selection, medical evaluations, fit tests, training, and inspections as required by Cal/OSHA and the silica standard.</li>
+                </ul>
+                <h4>Training</h4>
+                <p>Provide comprehensive training before initial assignment and annually on:</p>
+                <ul>
+                    <li>Respiratory hazards (including silica)</li>
+                    <li>Proper use, limitations, and maintenance of respirators</li>
+                    <li>Procedures for donning, doffing, user seal checks, and emergency use</li>
+                    <li>Recognition of medical symptoms that may limit or prevent effective respirator use</li>
+                </ul>
+                <p>Retrain employees if workplace conditions, respirator types, or procedures change, or if improper use is observed.</p>
+                <p>Document all training sessions, including dates, attendees, and topics covered.</p>
+                <h4>Documentation</h4>
+                <p>Maintain:</p>
+                <ul>
+                    <li>Written Respiratory Protection Program</li>
+                    <li>Hazard assessments and respirator selection records</li>
+                    <li>Medical evaluation and fit test records</li>
+                    <li>Training records</li>
+                    <li>Inspection and maintenance logs</li>
+                </ul>
+                <p>Store records securely and make available for regulatory review as required by Cal/OSHA.</p>
+                <h4>Program Review</h4>
+                <p>Review and update the Respiratory Protection Program at least annually, after incidents, or when regulations, workplace conditions, or equipment change.</p>
+                <p>Solicit feedback from employees and supervisors to improve effectiveness.</p>
+                <p>Document each review, noting changes made and reasons for those changes.</p>`
+            },
+            scaff: {
+                title: 'Scaffolding Safety Program',
+                body: `<h4>Responsibilities</h4>
+                <p><strong>Director/Safety Officer:</strong> Develops, implements, and maintains the Scaffolding Safety Program in compliance with Cal/OSHA Title 8 §1637 and related standards. Ensures scaffold design, erection, use, and dismantling meet regulatory and manufacturer requirements. Secures permits for scaffolds exceeding three stories or 36 feet in height.</p>
+                <p><strong>Qualified Person:</strong> Supervises scaffold erection, alteration, and dismantling. Ensures scaffolds are built according to engineered specifications or manufacturer instructions and that all components are compatible and in good condition.</p>
+                <p><strong>Competent Person:</strong> Conducts daily pre-shift inspections of scaffolds, platforms, and access points. Identifies hazards, corrects deficiencies, and has authority to stop work if unsafe conditions exist.</p>
+                <p><strong>Supervisors/Foremen:</strong> Ensure employees use scaffolds safely, do not overload platforms, and follow safe work practices. Report defects or unsafe conditions immediately.</p>
+                <p><strong>Employees:</strong> Use scaffolds only as trained and authorized, follow all safety rules, report hazards, and never alter scaffold structures.</p>
+                <h4>Program Details</h4>
+                <p><strong>Design and Erection:</strong></p>
+                <ul>
+                    <li>Scaffolds must support their own weight plus at least four times the maximum intended load.</li>
+                    <li>Erect and dismantle scaffolds under the supervision of a qualified person, following engineered specifications or manufacturer instructions.</li>
+                    <li>Obtain a Cal/OSHA permit for scaffolds over three stories or 36 feet high.</li>
+                    <li>Only use compatible components; never mix parts from different manufacturers.</li>
+                </ul>
+                <p><strong>Platform Requirements:</strong></p>
+                <ul>
+                    <li>Platforms must be at least 20 inches wide and not sloped more than 2 feet vertically to 10 feet horizontally.</li>
+                    <li>Planks must be scaffold-grade and able to support their own weight plus four times the intended load.</li>
+                    <li>Keep platforms free of slippery conditions unless necessary for the work.</li>
+                </ul>
+                <p><strong>Access and Egress:</strong></p>
+                <ul>
+                    <li>Provide safe access (ladders, stairs, walkways) to all platforms.</li>
+                    <li>Do not climb cross braces or over guardrails to access scaffolds.</li>
+                </ul>
+                <p><strong>Fall and Overhead Protection:</strong></p>
+                <ul>
+                    <li>Install guardrails on all open sides and ends of platforms 7½ feet or higher.</li>
+                    <li>Use toe boards at least 4 inches high on all railed sides to prevent falling tools and debris.</li>
+                    <li>Provide overhead protection when workers exposed to falling objects or overhead hazards.</li>
+                </ul>
+                <p><strong>Anchorage and Stability:</strong></p>
+                <ul>
+                    <li>Anchor and brace scaffolds to prevent swaying, tipping, or collapse.</li>
+                    <li>Keep scaffolds clear of electrical lines and maintain safe distances from power sources.</li>
+                    <li>For rolling scaffolds, lock casters when in use and ensure stability before climbing.</li>
+                </ul>
+                <p><strong>Load Management:</strong></p>
+                <ul>
+                    <li>Do not exceed manufacturer or engineered load limits.</li>
+                    <li>Distribute materials and tools evenly to avoid overloading any section.</li>
+                    <li>Store materials securely to prevent shifting or falling.</li>
+                </ul>
+                <p><strong>Weather and Environmental Conditions:</strong></p>
+                <ul>
+                    <li>Do not use scaffolds in high winds, storms, or other unsafe weather conditions unless necessary precautions are taken.</li>
+                    <li>Remove or control slippery conditions before use.</li>
+                </ul>
+                <h4>Training</h4>
+                <p>Provide training for all scaffold users, erectors, and dismantlers on:</p>
+                <ul>
+                    <li>Scaffold hazards and safe work practices</li>
+                    <li>Proper use, access, and egress</li>
+                    <li>Load capacities and platform requirements</li>
+                    <li>Fall protection and overhead protection</li>
+                    <li>Emergency procedures and hazard reporting</li>
+                <li>Retrain employees when regulations, equipment, or procedures change, or if unsafe practices are observed.</li>
+                </ul>
+                <p>Document all training sessions, including dates, attendees, and topics covered.</p>
+                <h4>Documentation</h4>
+                <p>Maintain:</p>
+                <ul>
+                    <li>Scaffold design plans and permits (for scaffolds over 36 feet)</li>
+                    <li>Daily inspection checklists by the competent person</li>
+                    <li>Training records for all scaffold users and erectors</li>
+                    <li>Incident and corrective action reports</li>
+                </ul>
+                <p>Store documentation securely and make available for regulatory review as required.</p>
+                <h4>Program Review</h4>
+                <p>Review and update the Scaffolding Safety Program at least annually, after incidents, or when regulations or equipment change.</p>
+                <p>Solicit feedback from employees and supervisors to improve effectiveness.</p>
+                <p>Document each review, noting changes made and reasons for those changes.</p>`
+            },
+            workplace_violence: {
+                title: 'Workplace Violence Prevention Program',
+                body: `<h4>Responsibilities</h4>
+                <p><strong>Director/Safety Officer:</strong> Develops, implements, and maintains the Workplace Violence Prevention Program (WVPP) in compliance with Cal/OSHA and California Labor Code section 6401.9. Oversees hazard assessments, program updates, and ensures the WVPP is accessible to all employees.</p>
+                <p><strong>Supervisors/Foremen:</strong> Ensure employees are trained, encourage reporting of workplace violence without fear of retaliation, respond promptly to incidents, and coordinate post-incident response and investigations.</p>
+                <p><strong>Employees:</strong> Participate in training, follow all workplace violence prevention procedures, report incidents or threats promptly, and cooperate with investigations and corrective actions.</p>
+                <h4>Program Details</h4>
+                <p><strong>Plan Development and Employee Involvement:</strong></p>
+                <ul>
+                    <li>Actively involve employees in developing and implementing the WVPP, including hazard identification and evaluation. Customize the plan to address specific hazards at each worksite or location.</li>
+                </ul>
+                <p><strong>Hazard Assessment:</strong></p>
+                <ul>
+                    <li>Conduct regular assessments to identify, evaluate, and correct workplace violence hazards. Review and update assessments after incidents or when new hazards are recognized.</li>
+                </ul>
+                <p><strong>Incident Reporting and Response:</strong></p>
+                <ul>
+                    <li>Establish clear procedures for employees to report workplace violence or threats without fear of retaliation. Respond promptly to all reports, provide immediate care or first aid if needed, and coordinate with emergency services as appropriate.</li>
+                </ul>
+                <p><strong>Incident Investigation:</strong></p>
+                <ul>
+                    <li>Investigate all reported incidents of workplace violence, document findings, and implement corrective actions. Maintain a Violent Incident Log for every incident and retain records for at least five years.</li>
+                </ul>
+                <p><strong>Coordination with Other Employers:</strong></p>
+                <ul>
+                    <li>When multiple employers are present at a worksite, coordinate the implementation of the WVPP to ensure consistent protection for all workers.</li>
+                </ul>
+                <p><strong>Communication:</strong></p>
+                <ul>
+                    <li>Communicate the WVPP to all employees and authorized representatives. Ensure the plan is accessible at the worksite, posted in common areas, or available on a company intranet.</li>
+                </ul>
+                <p><strong>No Retaliation:</strong></p>
+                <ul>
+                    <li>Prohibit retaliation against employees who report workplace violence or participate in investigations.</li>
+                </ul>
+                <h4>Training</h4>
+                <p>Provide effective training to all employees when the WVPP is first established, annually thereafter, and whenever a new or previously unrecognized workplace violence hazard is identified.</p>
+                <p>Training topics include:</p>
+                <ul>
+                    <li>Recognizing workplace violence hazards</li>
+                    <li>Reporting procedures and employee rights</li>
+                    <li>Emergency response and evacuation protocols</li>
+                    <li>Roles and responsibilities under the WVPP</li>
+                </ul>
+                <p>Document all training sessions, including dates, attendees, and topics covered.</p>
+                <h4>Documentation</h4>
+                <p>Maintain:</p>
+                <ul>
+                    <li>Written Workplace Violence Prevention Program</li>
+                    <li>Records of hazard assessments and corrective actions</li>
+                    <li>Violent Incident Logs and investigation reports (retain for at least five years)</li>
+                    <li>Training records for all employees</li>
+                </ul>
+                <p>Store documentation securely and make it available for regulatory review as required.</p>
+                <h4>Program Review</h4>
+                <p>Review and update the WVPP at least annually, after incidents, or when deficiencies are observed or new hazards are identified.</p>
+                <p>Solicit feedback from employees and supervisors to improve effectiveness.</p>
+                <p>Document each review, noting changes made and reasons for those changes.</p>`
+            }
+        };
+
+        // Get references to key DOM elements
+        const companyNameInput = document.getElementById('companyName');
+        const manualHeaderCompany = document.getElementById('manualHeaderCompany');
+        const checkboxListDiv = document.getElementById('checkboxList');
+        const programsContainer = document.getElementById('programsContainer');
+        const downloadManualBtn = document.getElementById('downloadManualBtn'); // Get the new button
+        const tocList = document.getElementById('tocList'); // Get the TOC list element
+
+        // Function to update the manual content and TOC
+        function updateManual() {
+            const companyName = companyNameInput.value.trim();
+            const displayCompanyName = companyName || '[Company Name]';
+
+            // Update the header company name
+            manualHeaderCompany.textContent = displayCompanyName;
+
+            // Clear existing programs and TOC
+            programsContainer.innerHTML = '';
+            tocList.innerHTML = '';
+
+            // Get all program checkboxes
+            const programCheckboxes = checkboxListDiv.querySelectorAll('input[type="checkbox"]');
+
+            // Collect selected program keys
+            const selectedProgramKeys = [];
+            programCheckboxes.forEach(checkbox => {
+                if (checkbox.checked) {
+                    selectedProgramKeys.push(checkbox.id.replace('program-', ''));
+                }
+            });
+
+            // Sort selected programs alphabetically by title
+            const sortedSelectedPrograms = selectedProgramKeys
+                .map(key => ({ key, title: templates[key].title }))
+                .sort((a, b) => a.title.localeCompare(b.title));
+
+            // Iterate over sorted selected programs to add them to the manual and build TOC
+            sortedSelectedPrograms.forEach(({ key, title }) => {
+                const programTemplate = templates[key];
+                const cardId = `card-${key}`; // Unique ID for the card
+                const anchorId = `program-${key}-section`; // Unique ID for the anchor
+
+                // Create and append the program card
+                const cardDiv = document.createElement('div');
+                cardDiv.id = cardId;
+                cardDiv.className = 'card'; // Apply basic card styling
+
+                // Program title with anchor ID for TOC linking
+                const titleHeading = document.createElement('h3');
+                titleHeading.className = 'text-2xl font-bold text-gray-900 mb-4';
+                titleHeading.id = anchorId; // Set the anchor ID here
+                titleHeading.textContent = programTemplate.title;
+                cardDiv.appendChild(titleHeading);
+
+                // Program body, replacing [Company Name]
+                const bodyContent = document.createElement('div');
+                bodyContent.classList.add('manual-content-body'); // Add a class to easily select later for text download
+                bodyContent.innerHTML = programTemplate.body.replace(/\[Company Name\]/g, displayCompanyName);
+                cardDiv.appendChild(bodyContent);
+
+                programsContainer.appendChild(cardDiv);
+
+                // Add to Table of Contents
+                const tocItem = document.createElement('li');
+                const tocLink = document.createElement('a');
+                tocLink.href = `#${anchorId}`;
+                tocLink.textContent = title;
+                tocItem.appendChild(tocLink);
+                tocList.appendChild(tocItem);
+            });
+        }
+
+        // Function to handle manual download
+        function downloadManual() {
+            const companyName = companyNameInput.value.trim() || 'Your Company';
+            let manualContent = `# ${companyName} Safety Manual\n\n`;
+
+            // Add the disclaimer
+            const disclaimerText = document.querySelector('.disclaimer-card').innerText; // Get text from the element
+            manualContent += `--- Disclaimer ---\n${disclaimerText.replace('Disclaimer: Important Notice', 'Disclaimer')}\n\n`;
+
+            // Add Table of Contents to download
+            if (tocList.children.length > 0) {
+                manualContent += `## Table of Contents\n`;
+                Array.from(tocList.children).forEach(item => {
+                    const linkText = item.textContent.trim();
+                    manualContent += `- ${linkText}\n`;
+                });
+                manualContent += `\n`;
+            }
+
+            // Iterate through the displayed program cards
+            const programCards = programsContainer.querySelectorAll('.card');
+            programCards.forEach(card => {
+                const title = card.querySelector('h3')?.textContent || 'Untitled Program';
+                const body = card.querySelector('.manual-content-body')?.innerText || ''; // Use the new class to get body
+
+                manualContent += `## ${title}\n\n`;
+                manualContent += body + '\n\n';
+            });
+
+            // Create a Blob and download it
+            const blob = new Blob([manualContent], { type: 'text/plain;charset=utf-8' });
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = `${companyName.replace(/\s+/g, '-')}-Safety-Manual.txt`;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            URL.revokeObjectURL(link.href); // Clean up the URL object
+        }
+
+        // Populate checkboxes dynamically and attach event listeners
+        function populateCheckboxes() {
+            // Convert templates object to an array of [key, value] pairs
+            const sortedPrograms = Object.entries(templates).sort(([, a], [, b]) => {
+                return a.title.localeCompare(b.title); // Sort alphabetically by title
+            });
+
+            sortedPrograms.forEach(([key, program]) => {
+                const div = document.createElement('div');
+                div.className = 'flex items-center'; // Tailwind classes for alignment
+
+                const checkbox = document.createElement('input');
+                checkbox.type = 'checkbox';
+                checkbox.id = `program-${key}`;
+                checkbox.name = `program-${key}`;
+                checkbox.className = 'h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded'; // Tailwind classes
+
+                const label = document.createElement('label');
+                label.htmlFor = `program-${key}`;
+                label.className = 'ml-3 block text-sm font-medium text-gray-700';
+                label.textContent = program.title;
+
+                div.appendChild(checkbox);
+                div.appendChild(label);
+                checkboxListDiv.appendChild(div);
+
+                // Attach event listener to each checkbox
+                checkbox.addEventListener('change', updateManual);
+            });
+        }
+
+        // Initial setup on page load
+        document.addEventListener('DOMContentLoaded', () => {
+            populateCheckboxes();
+            // Attach event listener for company name input
+            companyNameInput.addEventListener('input', updateManual);
+            // Attach event listener for download button
+            downloadManualBtn.addEventListener('click', downloadManual);
+            // Perform an initial update to render the disclaimer and any default content
+            updateManual();
+        });
+    </script>
+</body>
+</html>
