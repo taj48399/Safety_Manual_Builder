@@ -88,24 +88,24 @@
             .disclaimer-card,
             .sidebar-panel,
             .print-hidden { /* Added .print-hidden to hide specific elements like the download button */
-                display: none;
+                display: none !important; /* Added !important for stronger override */
             }
             body {
-                display: block; /* Override flex for body in print to allow full width for main content */
+                display: block !important; /* Override flex for body in print to allow full width for main content */
             }
             main {
-                width: 100%; /* Ensure main content takes full width */
-                margin: 0;
-                padding: 0;
+                width: 100% !important; /* Ensure main content takes full width */
+                margin: 0 !important;
+                padding: 0 !important;
             }
             /* Force each program card to start on a new page */
             #programsContainer .card {
-                break-after: page;
+                break-after: page !important;
                 margin-bottom: 0 !important; /* Remove bottom margin to prevent extra space at page breaks */
             }
             /* Ensure the last card does not force an extra blank page */
             #programsContainer .card:last-child {
-                break-after: auto;
+                break-after: auto !important;
             }
         }
     </style>
