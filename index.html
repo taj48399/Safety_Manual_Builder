@@ -85,6 +85,10 @@
 
         /* Hide elements and enforce page breaks when printing */
         @media print {
+            html, body {
+                margin: 0 !important;
+                padding: 0 !important;
+            }
             .disclaimer-card,
             .sidebar-panel,
             .print-hidden { /* Added .print-hidden to hide specific elements like the download button */
@@ -101,6 +105,7 @@
             /* Force the main manual title to start on a new page */
             .manual-main-title {
                 break-before: page !important;
+                margin-top: 0 !important; /* Ensure no top margin pushes it down */
             }
             /* Force each program card to start on a new page */
             #programsContainer .card {
@@ -860,7 +865,7 @@
                 <ul>
                     <li>Equipment operation and safety procedures</li>
                     <li>Pre-operation inspection and maintenance</li>
-                    <li>Load handling, stability, and capacity</li>
+                    <li>Load handling and stability</li>
                     <li>Workplace-specific hazards and surface conditions</li>
                     <li>Safe practices around pedestrians, docks, and trailers</li>
                     <li>Emergency procedures and accident prevention</li>
