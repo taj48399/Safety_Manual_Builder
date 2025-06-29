@@ -173,6 +173,9 @@
             <button id="downloadManualBtn" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-md shadow-md transition duration-300 ease-in-out transform hover:scale-105 print-hidden">
                 Download Manual (Text)
             </button>
+            <button id="downloadWordBtn" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-md shadow-md transition duration-300 ease-in-out transform hover:scale-105 print-hidden">
+                Download Manual (Word)
+            </button>
             <button id="printPdfBtn" class="w-full bg-green-600 hover:bg-green-700 text-white font-semibold py-2 px-4 rounded-md shadow-md transition duration-300 ease-in-out transform hover:scale-105 print-hidden">
                 Print Manual (PDF)
             </button>
@@ -1066,6 +1069,7 @@
                     <li>Never allow riders unless the equipment is designed for more than one person.</li>
                     <li>Do not exceed load limits or use equipment for unintended purposes.</li>
                     <li>Park equipment on level ground, lower attachments, set brakes, and turn off the engine before dismounting.</li>
+                    <li>When leaving a forklift unattended, lower the forks, set the brakes, and shut off power; block wheels if on an incline.</li>
                 </ul>
                 <p><strong>Pedestrian and Traffic Safety:</strong></p>
                 <ul>
@@ -1135,6 +1139,10 @@
                 <ul>
                     <li>Employees, their designated representatives, and Cal/OSHA representatives have the right to access and copy their medical and exposure records at no cost or to borrow them for a reasonable time to make copies. Employees must be informed of the location and availability of these records.</li>
                 </ul>
+                <p><strong>Confidentiality:</strong></p>
+                <ul>
+                    <li>All medical and exposure records are treated as confidential and protected from unauthorized disclosure.</li>
+                </ul>
                 <h4>Training</h4>
                 <p>Train employees on their rights to access medical and exposure records, the types of records maintained, and the process for requesting access.</p>
                 <p>Supervisors and HR staff receive additional training on regulatory requirements, confidentiality, and proper record handling.</p>
@@ -1154,7 +1162,58 @@
             },
             ppe: {
                 title: 'Personal Protective Equipment (PPE) Program',
-                body: `<h4>Responsibilities</h4><p><strong>Director/Safety Officer:</strong> Conducts hazard assessments…</p><h4>Program Review</h4><p>Annual review.</p>`
+                body: `<h4>Responsibilities</h4>
+                <p><strong>Director/Safety Officer:</strong> Develops, implements, and maintains the Personal Protective Equipment (PPE) Program in compliance with Cal/OSHA regulations. Ensures hazard assessments are conducted, appropriate PPE is selected, and employees are trained in its use and care.</p>
+                <p><strong>Supervisors/Foremen:</strong> Ensure employees use required PPE, enforce compliance, inspect PPE for damage, and report any deficiencies or unsafe practices.</p>
+                <p><strong>Employees:</strong> Use assigned PPE properly, inspect it before use, maintain it, and report any defects or lost PPE immediately.</p>
+                <h4>Program Details</h4>
+                <p><strong>Hazard Assessment:</strong></p>
+                <ul>
+                    <li>Conduct a comprehensive hazard assessment for each task and work area to identify potential hazards (e.g., impact, penetration, chemicals, heat, light radiation) that require PPE.</li>
+                </ul>
+                <p><strong>PPE Selection:</strong></p>
+                <ul>
+                    <li>Select appropriate PPE for each identified hazard based on established standards (e.g., ANSI, NIOSH). Ensure PPE fits properly and is comfortable for the employee.</li>
+                </ul>
+                <p><strong>Types of PPE Covered:</strong></p>
+                <ul>
+                    <li>Head Protection (e.g., hard hats)</li>
+                    <li>Eye and Face Protection (e.g., safety glasses, face shields)</li>
+                    <li>Hearing Protection (e.g., earplugs, earmuffs)</li>
+                    <li>Foot Protection (e.g., safety-toe shoes)</li>
+                    <li>Hand Protection (e.g., gloves)</li>
+                    <li>Body Protection (e.g., high-visibility vests, chemical-resistant clothing)</li>
+                    <li>Respiratory Protection (separate program or integrated)</li>
+                </ul>
+                <p><strong>Maintenance and Storage:</strong></p>
+                <ul>
+                    <li>Provide clear procedures for cleaning, maintaining, and storing PPE to ensure its effectiveness and longevity.</li>
+                    <li>Replace damaged or worn-out PPE promptly.</li>
+                </ul>
+                <h4>Training</h4>
+                <p>Provide training to all employees required to use PPE before initial assignment and when new hazards or PPE types are introduced. Training topics include:</p>
+                <ul>
+                    <li>When PPE is necessary</li>
+                    <li>What PPE is necessary</li>
+                    <li>How to properly don, doff, adjust, and wear PPE</li>
+                    <li>The limitations of the PPE</li>
+                    <li>Proper care, maintenance, useful life, and disposal of the PPE</li>
+                </ul>
+                <p>Document all training sessions, including dates, attendees, and topics covered.</p>
+                <h4>Documentation</h4>
+                <p>Maintain:</p>
+                <ul>
+                    <li>Written PPE Program</li>
+                    <li>Hazard assessment forms</li>
+                    <li>PPE selection and distribution records</li>
+                    <li>Training records for all employees</li>
+                    <li>Incident and corrective action reports related to PPE</li>
+                </ul>
+                <p>Store documentation securely and make it available for regulatory review as required.</p>
+                <h4>Program Review</h4>
+                <p>Review and update the PPE Program at least annually, after incidents, or when new equipment, processes, or hazards are introduced.</p>
+                <p>Solicit feedback from employees and supervisors to improve effectiveness.</p>
+                <p>Document each review, noting changes made and reasons for those changes.</p>`
             },
             records: {
                 title: 'Recordkeeping & Reporting Program',
@@ -1537,6 +1596,7 @@
         const checkboxListDiv = document.getElementById('checkboxList');
         const programsContainer = document.getElementById('programsContainer');
         const downloadManualBtn = document.getElementById('downloadManualBtn');
+        const downloadWordBtn = document.getElementById('downloadWordBtn'); // New button
         const printPdfBtn = document.getElementById('printPdfBtn');
         const tocList = document.getElementById('tocList');
 
@@ -1679,7 +1739,7 @@
             updateManual(); // Update manual preview when checkbox changes
         }
 
-        // Function to handle manual download
+        // Function to handle manual download as plain text
         function downloadManual() {
             const companyName = companyNameInput.value.trim() || 'Your Company';
             let manualContent = `# ${companyName} Safety Manual\n\n`;
@@ -1737,6 +1797,152 @@
             URL.revokeObjectURL(link.href); // Clean up the URL object
         }
 
+        // Function to handle manual download as a Word document (.doc)
+        function downloadWordManual() {
+            const companyName = companyNameInput.value.trim() || 'Your Company';
+            const fileName = `${companyName.replace(/\s+/g, '-')}-Safety-Manual.doc`;
+
+            // Create a temporary container to hold the content for Word export
+            const exportContainer = document.createElement('div');
+
+            // Clone the main title, disclaimer, TOC, and programs container
+            const mainTitleClone = document.querySelector('.manual-main-title').cloneNode(true);
+            const disclaimerClone = document.querySelector('.disclaimer-card').cloneNode(true);
+            const tocClone = document.getElementById('tableOfContents').cloneNode(true);
+            const programsClone = document.getElementById('programsContainer').cloneNode(true);
+
+            // Apply specific inline styles for the main title for Word output
+            mainTitleClone.style.fontSize = '48pt'; /* Large font size */
+            mainTitleClone.style.textAlign = 'center';
+            mainTitleClone.style.marginTop = '200px'; /* Push it down the page */
+            mainTitleClone.style.marginBottom = '50px';
+            mainTitleClone.style.fontFamily = 'Inter, sans-serif'; /* Ensure font consistency */
+            mainTitleClone.style.fontWeight = 'bold';
+            mainTitleClone.style.color = '#111827'; /* Ensure dark text color */
+
+
+            // Append cloned elements to the export container
+            exportContainer.appendChild(mainTitleClone);
+            exportContainer.appendChild(disclaimerClone);
+            exportContainer.appendChild(tocClone);
+            exportContainer.appendChild(programsClone);
+
+            // Construct the full HTML for the .doc file, including embedded styles
+            const htmlContent = `
+                <html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/TR/REC-html40'>
+                <head>
+                    <meta charset='utf-8'>
+                    <title>${companyName} Safety Manual</title>
+                    <style>
+                        /* Basic styles for Word output to ensure consistent rendering */
+                        body {
+                            font-family: 'Inter', sans-serif;
+                            margin: 1in; /* Standard page margins */
+                            color: #1f2937; /* Default text color */
+                        }
+                        /* Styles for the main title within the Word document */
+                        h1 {
+                            font-size: 48pt;
+                            text-align: center;
+                            margin-top: 200px; /* Adjust as needed to vertically center */
+                            margin-bottom: 50px;
+                            font-weight: bold;
+                            color: #111827;
+                        }
+                        h3 {
+                            font-size: 1.5em; /* Larger headings */
+                            font-weight: bold;
+                            margin-top: 1.5rem;
+                            margin-bottom: 0.5rem;
+                            color: #111827;
+                        }
+                        h4 {
+                            font-size: 1.25rem;
+                            font-weight: 600;
+                            margin-top: 1.5rem;
+                            margin-bottom: 0.5rem;
+                            color: #111827;
+                        }
+                        p, ul, ol {
+                            margin-bottom: 1rem;
+                            line-height: 1.6;
+                        }
+                        ul {
+                            list-style-type: disc;
+                            margin-left: 1.5rem;
+                        }
+                        ol {
+                            list-style-type: decimal;
+                            margin-left: 1.5rem;
+                        }
+                        .card {
+                            background-color: #ffffff; /* white background */
+                            border: 1px solid #e5e7eb; /* light gray border */
+                            border-radius: 0.5rem;
+                            padding: 1.5rem;
+                            margin-bottom: 1.5rem;
+                            box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.05), 0 1px 2px -1px rgba(0, 0, 0, 0.05);
+                        }
+                        /* Specific styles for TOC card */
+                        #tableOfContents {
+                            background-color: #eff6ff; /* blue-50 */
+                            border-color: #bfdbfe; /* blue-200 */
+                            color: #1e40af; /* blue-800 */
+                        }
+                        #tableOfContents h3 {
+                            color: #1e40af; /* blue-900 for TOC heading */
+                        }
+                        #tableOfContents ul {
+                            list-style-type: none;
+                            padding-left: 0;
+                        }
+                        #tableOfContents li {
+                            margin-bottom: 0.5rem;
+                        }
+                        #tableOfContents a {
+                            color: #2563eb; /* blue-600 */
+                            text-decoration: none;
+                            font-weight: 500;
+                        }
+                        #tableOfContents a:hover {
+                            text-decoration: underline;
+                        }
+                        /* Disclaimer card styles */
+                        .disclaimer-card {
+                            background-color: #fffbeb; /* yellow-50 */
+                            border-color: #fde68a; /* yellow-200 */
+                            color: #92400e; /* yellow-800 */
+                        }
+                        .disclaimer-card h4 {
+                            color: #92400e; /* yellow-900 */
+                        }
+                    </style>
+                    <!--[if gte mso 9]>
+                    <xml>
+                        <w:WordDocument>
+                            <w:View>Print</w:View>
+                            <w:Zoom>100</w:Zoom>
+                            <w:DoNotOptimizeForBrowser/>
+                        </w:WordDocument>
+                    </xml>
+                    <![endif]-->
+                </head>
+                <body>
+                    ${exportContainer.innerHTML}
+                </body>
+                </html>
+            `;
+
+            const blob = new Blob([htmlContent], { type: 'application/msword' });
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = fileName;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            URL.revokeObjectURL(link.href);
+        }
+
 
         // Function to handle printing the manual
         function printManual() {
@@ -1789,8 +1995,9 @@
             managerPhoneInput.addEventListener('input', updateManual);
             managerEmailInput.addEventListener('input', updateManual);
 
-            // Attach event listener for download button
+            // Attach event listener for download buttons
             downloadManualBtn.addEventListener('click', downloadManual);
+            downloadWordBtn.addEventListener('click', downloadWordManual); // New listener for Word download
             // Attach event listener for print button
             printPdfBtn.addEventListener('click', printManual);
 
