@@ -98,6 +98,10 @@
                 margin: 0 !important;
                 padding: 0 !important;
             }
+            /* Force the main manual title to start on a new page */
+            .manual-main-title {
+                break-before: page !important;
+            }
             /* Force each program card to start on a new page */
             #programsContainer .card {
                 break-after: page !important;
@@ -143,7 +147,7 @@
 
     <!-- Right Content Area for Manual Preview -->
     <main class="flex-1 p-6 md:p-8 bg-gray-50 overflow-auto">
-        <h1 class="text-3xl md:text-4xl font-extrabold text-gray-900 mb-6 text-center">
+        <h1 class="text-3xl md:text-4xl font-extrabold text-gray-900 mb-6 text-center manual-main-title">
             <span id="manualHeaderCompany">[Company Name]</span> Safety Manual
         </h1>
 
@@ -854,7 +858,8 @@
                 <h4>Training</h4>
                 <p>Provide initial and refresher training for all forklift operators, covering:</p>
                 <ul>
-                    <li>Equipment operation, inspection, and maintenance</li>
+                    <li>Equipment operation and safety procedures</li>
+                    <li>Pre-operation inspection and maintenance</li>
                     <li>Load handling, stability, and capacity</li>
                     <li>Workplace-specific hazards and surface conditions</li>
                     <li>Safe practices around pedestrians, docks, and trailers</li>
