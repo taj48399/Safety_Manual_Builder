@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en"> 
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -105,7 +105,13 @@
             /* Force the main manual title to start on a new page */
             .manual-main-title {
                 break-before: page !important;
-                margin-top: 0 !important; /* Ensure no top margin pushes it down */
+                /* Adjust font size for print */
+                font-size: 4.5rem !important; /* Approx Tailwind text-7xl or slightly larger */
+                line-height: 1 !important; /* Adjust line height if necessary */
+                /* Center vertically using margin-top, combined with text-center already there */
+                margin-top: 35vh !important; /* Push it down the page */
+                margin-bottom: 2rem !important; /* Add some space below */
+                text-align: center !important; /* Ensure it's centered horizontally */
             }
             /* Force the disclaimer to start on a new page after the main title */
             .disclaimer-card {
